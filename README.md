@@ -17,3 +17,4 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
 <br/>Will be used to download code dependencies - parts of code written by other developers
 
 5. Launch VSCode and clone this code repository to your computer
+![Clone Repository](https://github.com/taphos/game-graphics-course-2020/blob/main/images/instructions/clone.png?raw=true)
