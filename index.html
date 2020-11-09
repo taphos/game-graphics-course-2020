@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Video Game Graphics Course</title>        
+        <title>Video Game Graphics Course</title>
         <link rel="icon" href="data:;base64,iVBORw0KGgo=">
         <style>
             body {
@@ -63,9 +63,13 @@
                 return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
             }
 
-            let app = null;
             let loadScript = getParameterByName('load');
             if ('undefined' !== typeof loadScript && loadScript !== null) {
+                if (!navigator.gpu) {
+                    alert("Demos work only with latest Chrome Canary");
+                    window.history.back();
+                }
+
                 document.title = loadScript + " - " + document.title;
 
                 let canvas = document.createElement("canvas");
@@ -88,7 +92,10 @@
                 <a target="_blank" href="https://docs.google.com/presentation/d/1M9gSeZHJEcWCaNxPvwmJ_mXYg2bBeR2BrC5VvRZ1jUo/edit?usp=sharing">01 Introduction</a>
                 <a target="_blank" href="https://docs.google.com/presentation/d/1ztHy1gJGKNGWsfoFBuNIPkmI_QMYsc2zzpcFwG6oCzo/edit?usp=sharing">02 Rendering</a>
             </p>
-            <h2>Demos</h2>
+            <h2>
+                Demos
+                <span style="display:block; font-size:12px; font-weight: normal">Demos work only with latest Chrome Canary</span>
+            </h2>
             <p>
                 <a href="?load=./demos/simple-rendering.js">01 Simple rendering</a>
             </p>
