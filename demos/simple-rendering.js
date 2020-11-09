@@ -1,4 +1,4 @@
-import {mat4, vec3} from "../node_modules/gl-matrix/esm/index.js";
+import {mat4, vec3} from "https://cdn.jsdelivr.net/npm/gl-matrix@3.3.0/esm/index.js";
 
 const cubeVertexSize = 4 * 10; // Byte size of one cube vertex.
 const cubePositionOffset = 0;

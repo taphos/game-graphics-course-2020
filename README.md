@@ -8,14 +8,23 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
 <br/>This is a code cloud storage
 <br/>Choose any nickname, but please use a real name, so I know who you are :grin:
 
-2. Install VSCode https://code.visualstudio.com/Download
-<br/>This is IDE (Integrated Development Environment) - basically just an advanced text editor, we will use it to write code
+2. Install tools
 
-3. Install Git https://git-scm.com/downloads
-<br/>Version Control System - will be used to "download" and "upload" code to GitHub
+    * Install GitHub desktop https://desktop.github.com
+    <br/>Git is a Version Control System - will be used to "download" and "upload" code
+    
+    * Install VSCode https://code.visualstudio.com/Download
+    <br/>This is IDE (Integrated Development Environment) - basically just an advanced text editor, we will use it to write code
 
-4. Install NodeJS https://nodejs.org/en/download
-<br/>Will be used to download code dependencies - parts of code written by other developers
+    * Install Google Chrome Canary https://www.google.com/chrome/canary
+    <br/> Cutting edge version for developers
+    
+2. Launch GitHub Desktop and clone ("download") this code repository to your computer
+    <br/>https://github.com/taphos/game-graphics-course-2020
+    
+3. Open cloned repo in VSCode (GitHub Desktop -> Repository -> Open is VSCode)
 
-5. Launch VSCode and clone ("download") this code repository to your computer
-<br/>![Clone Repository](https://github.com/taphos/game-graphics-course-2020/blob/main/images/instructions/clone.png?raw=true)
+4. Click "Go Live" button in VSCode bottom bar
+
+5. Open link in Chrome Canary http://localhost:5500
+
