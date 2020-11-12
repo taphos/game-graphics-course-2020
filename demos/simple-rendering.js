@@ -1,255 +1,236 @@
-import {mat4, vec3} from "https://cdn.jsdelivr.net/npm/gl-matrix@3.3.0/esm/index.js";
+import PicoGL from "../node_modules/picogl/build/module/picogl.js";
+import {mat4, vec3, vec4} from "../node_modules/gl-matrix/esm/index.js";
 
-const cubeVertexSize = 4 * 10; // Byte size of one cube vertex.
-const cubePositionOffset = 0;
-const cubeColorOffset = 4 * 4; // Byte offset of cube vertex color attribute.
-const cubeUVOffset = 4 * 8;
-const cubeVertexArray = new Float32Array([
-    // float4 position, float4 color, float2 uv,
-    1, -1, 1, 1,   1, 0, 1, 1,  1, 1,
-    -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
-    -1, -1, -1, 1, 0, 0, 0, 1,  0, 0,
-    1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
-    1, -1, 1, 1,   1, 0, 1, 1,  1, 1,
-    -1, -1, -1, 1, 0, 0, 0, 1,  0, 0,
+// *********************************************************************************************************************
+// **                                                                                                                 **
+// **                  This is an example of simplistic forward rendering technique using WebGL                       **
+// **                                                                                                                 **
+// *********************************************************************************************************************
 
-    1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
-    1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
-    1, -1, -1, 1,  1, 0, 0, 1,  0, 0,
-    1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-    1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
-    1, -1, -1, 1,  1, 0, 0, 1,  0, 0,
+// Home task: change anything you like in this small demo, be creative and make it look cool ;)
+// * You can change 3D cube model with any other mesh using Blender WebGL export addon, check blender/export_webgl.py
+// * Change object and camera transformations inside draw() function
+// * Change colors using bgColor and fgColor variables
+// * Distort object shape inside vertexShader
+// * Distort object colors inside fragmentShader
 
-    -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-    1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-    1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
-    -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-    -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-    1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
+// ******************************************************
+// **                       Data                       **
+// ******************************************************
 
-    -1, -1, 1, 1,  0, 0, 1, 1,  1, 1,
-    -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-    -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
-    -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
-    -1, -1, 1, 1,  0, 0, 1, 1,  1, 1,
-    -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
+let positions = new Float32Array([
+    // front
+    -0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, -0.5, 0.5,
+    -0.5, -0.5, 0.5,
 
-    1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
-    -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-    -1, -1, 1, 1,  0, 0, 1, 1,  0, 0,
-    -1, -1, 1, 1,  0, 0, 1, 1,  0, 0,
-    1, -1, 1, 1,   1, 0, 1, 1,  1, 0,
-    1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
+    // back
+    -0.5, 0.5, -0.5,
+    0.5, 0.5, -0.5,
+    0.5, -0.5, -0.5,
+    -0.5, -0.5, -0.5,
 
-    1, -1, -1, 1,  1, 0, 0, 1,  1, 1,
-    -1, -1, -1, 1, 0, 0, 0, 1,  0, 1,
-    -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
-    1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-    1, -1, -1, 1,  1, 0, 0, 1,  1, 1,
-    -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
+    //top
+    -0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, -0.5,
+    -0.5, 0.5, -0.5,
+
+    //bottom
+    -0.5, -0.5, 0.5,
+    0.5, -0.5, 0.5,
+    0.5, -0.5, -0.5,
+    -0.5, -0.5, -0.5,
+
+    //left
+    -0.5, -0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    -0.5, 0.5, -0.5,
+    -0.5, -0.5, -0.5,
+
+    //right
+    0.5, -0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, -0.5,
+    0.5, -0.5, -0.5,
 ]);
 
-const wgslShaders = {
-    vertex: `
-        [[block]] struct Uniforms {
-            [[offset(0)]] modelViewProjectionMatrix : mat4x4<f32>;
-        };
+let normals = new Float32Array([
+    // front
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
 
-        [[binding(0), set(0)]] var<uniform> uniforms : Uniforms;
+    // back
+    0.0, 0.0, -1.0,
+    0.0, 0.0, -1.0,
+    0.0, 0.0, -1.0,
+    0.0, 0.0, -1.0,
 
-        [[location(0)]] var<in> position : vec4<f32>;
-        [[location(1)]] var<in> color : vec4<f32>;
+    //top
+    0.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,
 
-        [[builtin(position)]] var<out> Position : vec4<f32>;
-        [[location(0)]] var<out> fragColor : vec4<f32>;
+    //bottom
+    0.0, -1.0, 0.0,
+    0.0, -1.0, 0.0,
+    0.0, -1.0, 0.0,
+    0.0, -1.0, 0.0,
 
-        [[stage(vertex)]]
-        fn main() -> void {
-            Position = uniforms.modelViewProjectionMatrix * position;
-            fragColor = color;
-            return;
-        }
-    `,
-    fragment: `
-        [[location(0)]] var<in> fragColor : vec4<f32>;
-        [[location(0)]] var<out> outColor : vec4<f32>;
+    //left
+    -1.0, 0.0, 0.0,
+    -1.0, 0.0, 0.0,
+    -1.0, 0.0, 0.0,
+    -1.0, 0.0, 0.0,
 
-        [[stage(fragment)]]
-        fn main() -> void {
-            outColor = fragColor;
-            return;
-        }
-    `,
-};
+    //right
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+]);
 
-(async () => {
-    const canvas = document.querySelector("canvas");
-    const adapter = await navigator.gpu.requestAdapter();
-    const device = await adapter.requestDevice();
+let triangles = new Uint16Array([
+    // front
+    2, 1, 0,
+    0, 3, 2,
 
-    const aspect = Math.abs(canvas.width / canvas.height);
-    let projectionMatrix = mat4.create();
-    mat4.perspective(projectionMatrix, (2 * Math.PI) / 5, aspect, 1, 100.0);
+    // back
+    4, 5, 6,
+    6, 7, 4,
 
-    const context = canvas.getContext("gpupresent") || canvas.getContext("gpu");
+    // top
+    8, 9, 10,
+    10, 11, 8,
 
-    const swapChain = context.configureSwapChain({
-        device,
-        format: "bgra8unorm",
-    });
+    // bottom
+    14, 13, 12,
+    12, 15, 14,
 
-    const verticesBuffer = device.createBuffer({
-        size: cubeVertexArray.byteLength,
-        usage: GPUBufferUsage.VERTEX,
-        mappedAtCreation: true,
-    });
-    new Float32Array(verticesBuffer.getMappedRange()).set(cubeVertexArray);
-    verticesBuffer.unmap();
+    // left
+    16, 17, 18,
+    18, 19, 16,
 
-    const pipeline = device.createRenderPipeline({
-        vertexStage: {
-            module:
-                device.createShaderModule({
-                    code: wgslShaders.vertex,
-                }),
-            entryPoint: "main",
-        },
-        fragmentStage: {
-            module:
-                device.createShaderModule({
-                    code: wgslShaders.fragment,
-                }),
-            entryPoint: "main",
-        },
+    // right
+    22, 21, 20,
+    20, 23, 22,
+]);
 
-        primitiveTopology: "triangle-list",
-        depthStencilState: {
-            depthWriteEnabled: true,
-            depthCompare: "less",
-            format: "depth24plus-stencil8",
-        },
-        vertexState: {
-            vertexBuffers: [
-                {
-                    arrayStride: cubeVertexSize,
-                    attributes: [
-                        {
-                            // position
-                            shaderLocation: 0,
-                            offset: cubePositionOffset,
-                            format: "float4",
-                        },
-                        {
-                            // color
-                            shaderLocation: 1,
-                            offset: cubeColorOffset,
-                            format: "float4",
-                        },
-                    ],
-                },
-            ],
-        },
 
-        rasterizationState: {
-            cullMode: "back",
-        },
+// ******************************************************
+// **                 Pixel processing                 **
+// ******************************************************
 
-        colorStates: [
-            {
-                format: "bgra8unorm",
-            },
-        ],
-    });
-
-    const depthTexture = device.createTexture({
-        size: {
-            width: canvas.width,
-            height: canvas.height,
-            depth: 1,
-        },
-        format: "depth24plus-stencil8",
-        usage: GPUTextureUsage.OUTPUT_ATTACHMENT,
-    });
-
-    const renderPassDescriptor = {
-        colorAttachments: [
-            {
-                // attachment is acquired and set in render loop.
-                attachment: undefined,
-
-                loadValue: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 },
-            },
-        ],
-        depthStencilAttachment: {
-            attachment: depthTexture.createView(),
-
-            depthLoadValue: 1.0,
-            depthStoreOp: "store",
-            stencilLoadValue: 0,
-            stencilStoreOp: "store",
-        },
-    };
-
-    const uniformBufferSize = 4 * 16; // 4x4 matrix
-
-    const uniformBuffer = device.createBuffer({
-        size: uniformBufferSize,
-        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    const uniformBindGroup = device.createBindGroup({
-        layout: pipeline.getBindGroupLayout(0),
-        entries: [
-            {
-                binding: 0,
-                resource: {
-                    buffer: uniformBuffer,
-                },
-            },
-        ],
-    });
-
-    function getTransformationMatrix() {
-        let viewMatrix = mat4.create();
-        mat4.translate(viewMatrix, viewMatrix, vec3.fromValues(0, 0, -5));
-        let now = Date.now() / 1000;
-        mat4.rotate(
-            viewMatrix,
-            viewMatrix,
-            1,
-            vec3.fromValues(Math.sin(now), Math.cos(now), 0)
-        );
-
-        let modelViewProjectionMatrix = mat4.create();
-        mat4.multiply(modelViewProjectionMatrix, projectionMatrix, viewMatrix);
-
-        return modelViewProjectionMatrix;
+// language=GLSL
+let fragmentShader = `
+    #version 300 es
+    precision highp float;
+    
+    in vec4 color;
+    
+    out vec4 outColor;
+    
+    void main()
+    {
+        outColor = color;
     }
+`;
 
-    function render() {
-        const transformationMatrix = getTransformationMatrix();
-        device.defaultQueue.writeBuffer(
-            uniformBuffer,
-            0,
-            transformationMatrix.buffer,
-            transformationMatrix.byteOffset,
-            transformationMatrix.byteLength
-        );
-        renderPassDescriptor.colorAttachments[0].attachment = swapChain
-            .getCurrentTexture()
-            .createView();
 
-        const commandEncoder = device.createCommandEncoder();
-        const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-        passEncoder.setPipeline(pipeline);
-        passEncoder.setBindGroup(0, uniformBindGroup);
-        passEncoder.setVertexBuffer(0, verticesBuffer);
-        passEncoder.draw(36, 1, 0, 0);
-        passEncoder.endPass();
-        device.defaultQueue.submit([commandEncoder.finish()]);
+// ******************************************************
+// **               Geometry processing                **
+// ******************************************************
 
-        requestAnimationFrame(render);
+// language=GLSL
+let vertexShader = `
+    #version 300 es
+    
+    uniform vec4 bgColor;
+    uniform vec4 fgColor;
+    uniform mat4 modelViewMatrix;
+    uniform mat4 modelViewProjectionMatrix;
+    
+    layout(location=0) in vec3 position;
+    layout(location=1) in vec3 normal;
+    
+    out vec4 color;
+    
+    void main()
+    {
+        gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
+        vec3 viewNormal = (modelViewMatrix * vec4(normal, 0.0)).xyz;
+        color = mix(bgColor * 0.8, fgColor, viewNormal.z) + pow(viewNormal.z, 10.0);
     }
+`;
 
-    render();
-})();
+
+// ******************************************************
+// **             Application processing               **
+// ******************************************************
+
+let bgColor = vec4.fromValues(1.0, 0.2, 0.3, 1.0);
+let fgColor = vec4.fromValues(1.0, 0.9, 0.5, 1.0);
+
+
+app.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+    .depthTest()
+    .enable(PicoGL.CULL_FACE);
+
+let program = app.createProgram(vertexShader.trim(), fragmentShader.trim());
+
+let vertexArray = app.createVertexArray()
+    .vertexAttributeBuffer(0, app.createVertexBuffer(PicoGL.FLOAT, 3, positions))
+    .vertexAttributeBuffer(1, app.createVertexBuffer(PicoGL.FLOAT, 3, normals))
+    .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, triangles));
+
+let projMatrix = mat4.create();
+let viewMatrix = mat4.create();
+let viewProjMatrix = mat4.create();
+let modelMatrix = mat4.create();
+let modelViewMatrix = mat4.create();
+let modelViewProjectionMatrix = mat4.create();
+let rotateXMatrix = mat4.create();
+let rotateYMatrix = mat4.create();
+
+let drawCall = app.createDrawCall(program, vertexArray)
+    .uniform("bgColor", bgColor)
+    .uniform("fgColor", fgColor);
+
+let startTime = new Date().getTime() / 1000;
+
+
+
+function draw() {
+    let time = new Date().getTime() / 1000 - startTime;
+
+    mat4.perspective(projMatrix, Math.PI / 4, app.width / app.height, 0.1, 100.0);
+    mat4.lookAt(viewMatrix, vec3.fromValues(3, 0, 2), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+    mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
+
+    mat4.fromXRotation(rotateXMatrix, time * 0.1136);
+    mat4.fromYRotation(rotateYMatrix, time * 0.2235);
+    mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
+
+    mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
+    mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
+
+    drawCall.uniform("modelViewMatrix", modelViewMatrix);
+    drawCall.uniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+
+    app.clear();
+    drawCall.draw();
+
+    // mat4.fromTranslation(modelMatrix, vec3.fromValues(0, 0, 0));
+    // mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
+    // mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
+    // drawCall.uniform("modelViewMatrix", modelViewMatrix);
+    // drawCall.uniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    // drawCall.draw();
+
+    requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);

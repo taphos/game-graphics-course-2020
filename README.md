@@ -16,15 +16,17 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
     * Install VSCode https://code.visualstudio.com/Download
     <br/>This is IDE (Integrated Development Environment) - basically just an advanced text editor, we will use it to write code
 
-    * Install Google Chrome Canary https://www.google.com/chrome/canary
-    <br/> Cutting edge version for developers
+    * Install NodeJS https://nodejs.org/en/download
+    <br/>We will use this to get code dependencies
     
 2. Launch GitHub Desktop and clone ("download") this code repository to your computer
     <br/>https://github.com/taphos/game-graphics-course-2020
     
 3. Open cloned repo in VSCode (GitHub Desktop -> Repository -> Open is VSCode)
 
-4. Click "Go Live" button in VSCode bottom bar
+4. Get code dependencies: from VSCode menu Terminal -> Run Task -> `npm install` 
 
-5. Open link in Chrome Canary http://localhost:5500
+4. Click "Go Live" button in VSCode bottom bar to start a local web server
+
+5. Open link in Chrome http://localhost:5500
 
