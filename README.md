@@ -26,7 +26,7 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
 
 4. Get code dependencies: from VSCode menu Terminal -> Run Task -> `npm install` 
 
-4. Click "Go Live" button in VSCode bottom bar to start a local web server
+4. Install VSCode "Live Server" extension. Click "Go Live" button in VSCode bottom bar to start a local web server
 
 5. Open link in Chrome http://localhost:5500
 
