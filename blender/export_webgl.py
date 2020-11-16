@@ -68,7 +68,7 @@ class ExportWebGL(bpy.types.Operator, ExportHelper):
                 object.name, ",".join([float_format.format(n * self.opt_Scale) for n in normals])))
             f.write("const uvs = new Float32Array([ {1} ]);\n".format(
                 object.name, ",".join([float_format.format(n) for n in uvs])))
-            f.write("const indices = new Float32Array([ {1} ]);\n".format(
+            f.write("const indices = new Uint16Array([ {1} ]);\n".format(
                 object.name, ",".join([str(i) for i in indices])))
 
     def execute(self, context):
