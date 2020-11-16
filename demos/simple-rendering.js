@@ -18,7 +18,7 @@ import {mat4, vec3, vec4} from "../node_modules/gl-matrix/esm/index.js";
 // **                       Data                       **
 // ******************************************************
 
-let positions = new Float32Array([
+const positions = new Float32Array([
     // front
     -0.5, 0.5, 0.5,
     0.5, 0.5, 0.5,
@@ -56,7 +56,7 @@ let positions = new Float32Array([
     0.5, -0.5, -0.5,
 ]);
 
-let normals = new Float32Array([
+const normals = new Float32Array([
     // front
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,
@@ -94,7 +94,7 @@ let normals = new Float32Array([
     1.0, 0.0, 0.0,
 ]);
 
-let triangles = new Uint16Array([
+const indices = new Uint16Array([
     // front
     2, 1, 0,
     0, 3, 2,
@@ -185,7 +185,7 @@ let program = app.createProgram(vertexShader.trim(), fragmentShader.trim());
 let vertexArray = app.createVertexArray()
     .vertexAttributeBuffer(0, app.createVertexBuffer(PicoGL.FLOAT, 3, positions))
     .vertexAttributeBuffer(1, app.createVertexBuffer(PicoGL.FLOAT, 3, normals))
-    .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, triangles));
+    .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, indices));
 
 let projMatrix = mat4.create();
 let viewMatrix = mat4.create();
