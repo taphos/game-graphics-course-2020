@@ -120,6 +120,8 @@ const indices = new Uint16Array([
     20, 23, 22,
 ]);
 
+// import {positions, normals, indices} from "../blender/torus.js"
+
 
 // ******************************************************
 // **                 Pixel processing                 **
@@ -149,6 +151,7 @@ let fragmentShader = `
 let vertexShader = `
     #version 300 es
     
+    uniform float time;
     uniform vec4 bgColor;
     uniform vec4 fgColor;
     uniform mat4 modelViewMatrix;
@@ -218,6 +221,7 @@ function draw() {
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
     mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
 
+    drawCall.uniform("time", time);
     drawCall.uniform("modelViewMatrix", modelViewMatrix);
     drawCall.uniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
 
