@@ -125,9 +125,13 @@ async function loadTexture(fileName) {
 }
 
 (async () => {
-    const texture = await loadTexture("abstract.jpg");
+    const tex = await loadTexture("abstract.jpg");
     let drawCall = app.createDrawCall(program, vertexArray)
-        .texture("tex", app.createTexture2D(texture, texture.width, texture.height, {flipY: true, magFilter: PicoGL.NEAREST, wrapT: PicoGL.REPEAT}));
+        .texture("tex", app.createTexture2D(tex, tex.width, tex.height, {
+            magFilter: PicoGL.LINEAR,
+            minFilter: PicoGL.LINEAR_MIPMAP_LINEAR,
+            maxAnisotropy: 10
+        }));
 
     let skyboxDrawCall = app.createDrawCall(skyboxProgram, skyboxArray)
         .texture("cubemap", app.createCubemap({
@@ -150,7 +154,7 @@ async function loadTexture(fileName) {
         mat4.lookAt(viewMatrix, camPos, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
         mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
 
-        mat4.fromXRotation(rotateXMatrix, time * 0.1136 - Math.PI / 2);
+        mat4.fromXRotation(rotateXMatrix, time * 0.1136);
         mat4.fromZRotation(rotateYMatrix, time * 0.2235);
         mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
 
