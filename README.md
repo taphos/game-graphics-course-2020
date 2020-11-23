@@ -5,13 +5,16 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
 ## Home Assignments
 
 1. Before start, make sure you successfully completed all steps of [Setup Instructions](#setup) below
-2. (Skip first time) Merge the latest changes into your forked repository (GitHub Desktop -> Branch ->  Merge info current -> upstream/main)
+2. (Skip first time) Merge the latest changes into your forked repository, using GitHub Desktop 
+    1. Fetch Origin
+    2. Branch -> Merge info current -> upstream/main
+    3. Push origin
 3. Make required changes, depending on the assignment, using VSCode
 4. In GitHub Desktop, verify changed files
 5. Write a meaningful summary message
 6. (First time only) You will be offered to fork repository, agree and create a fork
 7. Commit to main branch of the fork
-8. Push changes to GitHub server
+8. Press "Push origin" to push changes to GitHub server
 
 ## Home Assignment Setup Instructions<a name="setup"></a>
 
