@@ -120,15 +120,24 @@ let rotateXMatrix = mat4.create();
 let rotateYMatrix = mat4.create();
 let skyboxViewProjectionInverse = mat4.create();
 
-(async () => {
-    const texture = await createImageBitmap(await (await fetch("images/texture.jpg")).blob());
-    const skyTexture = await createImageBitmap(await (await fetch("images/texture.jpg")).blob());
+async function loadTexture(fileName) {
+    return await createImageBitmap(await (await fetch("images/" + fileName)).blob());
+}
 
+(async () => {
+    const texture = await loadTexture("abstract.jpg");
     let drawCall = app.createDrawCall(program, vertexArray)
         .texture("tex", app.createTexture2D(texture, texture.width, texture.height, {flipY: true, magFilter: PicoGL.NEAREST, wrapT: PicoGL.REPEAT}));
 
     let skyboxDrawCall = app.createDrawCall(skyboxProgram, skyboxArray)
-        .texture("cubemap", app.createCubemap({negX: texture, posX: texture, negY: texture, posY: texture, negZ: texture, posZ: texture}));
+        .texture("cubemap", app.createCubemap({
+            negX: await loadTexture("stormydays_bk.png"),
+            posX: await loadTexture("stormydays_ft.png"),
+            negY: await loadTexture("stormydays_dn.png"),
+            posY: await loadTexture("stormydays_up.png"),
+            negZ: await loadTexture("stormydays_lf.png"),
+            posZ: await loadTexture("stormydays_rt.png")
+        }));
 
     let startTime = new Date().getTime() / 1000;
 
@@ -137,7 +146,7 @@ let skyboxViewProjectionInverse = mat4.create();
         let time = new Date().getTime() / 1000 - startTime;
 
         mat4.perspective(projMatrix, Math.PI / 2, app.width / app.height, 0.1, 100.0);
-        let camPos = vec3.rotateY(vec3.create(), vec3.fromValues(0, -1, 2), vec3.fromValues(0, 0, 0), time * 0.05);
+        let camPos = vec3.rotateY(vec3.create(), vec3.fromValues(0, 0.5, 2), vec3.fromValues(0, 0, 0), time * 0.05);
         mat4.lookAt(viewMatrix, camPos, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
         mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
 
