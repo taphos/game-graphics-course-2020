@@ -2,7 +2,18 @@
 
 Video Game Graphics course for Estonian Entrepreneurship University of Applied Sciences, 2020
 
-## Home Assignment Instructions
+## Home Assignments
+
+1. Before start, make sure you successfully completed all steps of [Setup Instructions](#setup) below
+2. (Skip first time) Merge the latest changes into your forked repository (GitHub Desktop -> Branch ->  Merge info current -> upstream/main)
+3. Make required changes, depending on the assignment, using VSCode
+4. In GitHub Desktop, verify changed files
+5. Write a meaningful summary message
+6. (First time only) You will be offered to fork repository, agree and create a fork
+7. Commit to main branch of the fork
+8. Push changes to GitHub server
+
+## Home Assignment Setup Instructions<a name="setup"></a>
 
 1. Register a GitHub account https://github.com/join
 <br/>This is a code cloud storage
@@ -22,20 +33,10 @@ Video Game Graphics course for Estonian Entrepreneurship University of Applied S
 2. Launch GitHub Desktop and clone ("download") this code repository to your computer
     <br/>https://github.com/taphos/game-graphics-course-2020
     
-3. Open cloned repo in VSCode (GitHub Desktop -> Repository -> Open is VSCode)
+3. Open cloned repo in VSCode (GitHub Desktop -> Repository -> Open in VSCode)
 
 4. Get code dependencies: from VSCode menu Terminal -> Run Task -> `npm install` 
 
 4. Install VSCode "Live Server" extension. Click "Go Live" button in VSCode bottom bar to start a local web server
 
 5. Open link in Chrome http://localhost:5500
-
-## Commit Home Assignment
-
-1. Open GitHub Desktop
-2. Verify changed files
-3. Write a meaningful description message
-4. You will be offered to fork repository (first time only), agree and create a fork
-5. Commit to main branch of the fork
-6. Push changes to GitHub server
- 
