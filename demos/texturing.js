@@ -130,7 +130,9 @@ async function loadTexture(fileName) {
         .texture("tex", app.createTexture2D(tex, tex.width, tex.height, {
             magFilter: PicoGL.LINEAR,
             minFilter: PicoGL.LINEAR_MIPMAP_LINEAR,
-            maxAnisotropy: 10
+            maxAnisotropy: 10,
+            wrapS: PicoGL.REPEAT,
+            wrapT: PicoGL.REPEAT
         }));
 
     let skyboxDrawCall = app.createDrawCall(skyboxProgram, skyboxArray)
