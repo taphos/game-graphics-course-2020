@@ -115,8 +115,8 @@ let startTime = new Date().getTime() / 1000;
 let cameraPosition = vec3.fromValues(0, 0, 5);
 mat4.fromXRotation(modelMatrix, -Math.PI / 2);
 
-const positionsBuffer = new Float32Array(6);
-const colorsBuffer = new Float32Array(6);
+const positionsBuffer = new Float32Array(numberOfLights * 3);
+const colorsBuffer = new Float32Array(numberOfLights * 3);
 
 function draw() {
     let time = new Date().getTime() / 1000 - startTime;
@@ -125,20 +125,18 @@ function draw() {
     mat4.lookAt(viewMatrix, cameraPosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
     mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
-    for (let i = 0; i < lightInitialPositions.length; i++)
-        vec3.rotateZ(lightPositions[i], lightInitialPositions[i], vec3.fromValues(0, 0, 0), time);
-
     drawCall.uniform("viewProjectionMatrix", viewProjectionMatrix);
     drawCall.uniform("modelMatrix", modelMatrix);
     drawCall.uniform("cameraPosition", cameraPosition);
 
-    positionsBuffer.set(lightPositions[0]);
-    positionsBuffer.set(lightPositions[1], 3);
-    colorsBuffer.set(lightColors[0]);
-    colorsBuffer.set(lightColors[1], 3);
+    for (let i = 0; i < numberOfLights; i++) {
+        vec3.rotateZ(lightPositions[i], lightInitialPositions[i], vec3.fromValues(0, 0, 0), time);
+        positionsBuffer.set(lightPositions[i], i * 3);
+        colorsBuffer.set(lightColors[i], i * 3);
+    }
 
-    drawCall.uniform("lightPositions", positionsBuffer);
-    drawCall.uniform("lightColors", colorsBuffer);
+    drawCall.uniform("lightPositions[0]", positionsBuffer);
+    drawCall.uniform("lightColors[0]", colorsBuffer);
 
     app.clear();
     drawCall.draw();
