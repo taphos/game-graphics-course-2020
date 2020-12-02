@@ -104,7 +104,7 @@ let vertexArray = app.createVertexArray()
     .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, indices));
 
 // Change the shadow texture resolution to checkout the difference
-let shadowDepthTarget = app.createTexture2D(2048, 2048, {
+let shadowDepthTarget = app.createTexture2D(512, 512, {
     internalFormat: PicoGL.DEPTH_COMPONENT16,
     compareMode: PicoGL.COMPARE_REF_TO_TEXTURE,
     magFilter: PicoGL.LINEAR,
