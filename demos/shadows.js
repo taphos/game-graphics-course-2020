@@ -1,5 +1,4 @@
 // Shadow mapping demo
-// Home task: combine shadow mapping with texturing
 
 import PicoGL from "../node_modules/picogl/build/module/picogl.js";
 import {mat4, vec3, vec4, quat} from "../node_modules/gl-matrix/esm/index.js";
