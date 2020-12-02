@@ -1,5 +1,4 @@
 // This demo demonstrates simple cubemap reflections and more complex planar reflections
-// Home task: implement fresnel effect for both types of reflections
 
 import PicoGL from "../node_modules/picogl/build/module/picogl.js";
 import {mat4, vec3, mat3, vec4, vec2} from "../node_modules/gl-matrix/esm/index.js";
