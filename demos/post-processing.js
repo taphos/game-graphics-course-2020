@@ -19,14 +19,17 @@ let postIndices = new Uint16Array([
 // language=GLSL
 let fragmentShader = `
     #version 300 es
-    precision highp float;            
+    precision highp float;
+
+    uniform vec4 ambientColor;
+    uniform vec4 diffuseColor;
     
-    in vec4 color;
+    in vec3 vViewNormal;
     
     out vec4 outColor;       
     
     void main() {                      
-        outColor = color;
+        outColor =  + pow(vViewNormal.y, 5.0) + diffuseColor * clamp(vViewNormal.y, 0.0, 1.0) + ambientColor;
     }
 `;
 
@@ -34,21 +37,18 @@ let fragmentShader = `
 let vertexShader = `
     #version 300 es
     
-    uniform vec4 ambientColor;
-    uniform vec4 diffuseColor;
     uniform mat4 modelViewMatrix;
     uniform mat4 modelViewProjectionMatrix;
     
     layout(location=0) in vec3 position;
     layout(location=1) in vec3 normal;
     
-    out vec4 color;
+    out vec3 vViewNormal;
     
     void main()
     {
         gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
-        vec3 viewNormal = (modelViewMatrix * vec4(normalize(normal), 0.0)).xyz;
-        color = diffuseColor * clamp(viewNormal.y, 0.0, 1.0) + ambientColor;
+        vViewNormal = (modelViewMatrix * vec4(normalize(normal), 0.0)).xyz;
     }
 `;
 
@@ -128,7 +128,6 @@ let postVertexShader = `
 
 
 let bgColor = vec4.fromValues(0.1, 0.1, 0.1, 1.0);
-let fgColor = vec4.fromValues(1.0, 0.9, 0.5, 1.0);
 app.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
 
 let program = app.createProgram(vertexShader.trim(), fragmentShader.trim());
@@ -144,7 +143,7 @@ let postArray = app.createVertexArray()
     .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, postIndices));
 
 let colorTarget = app.createTexture2D(app.width, app.height, {magFilter: PicoGL.LINEAR, wrapS: PicoGL.CLAMP_TO_EDGE, wrapR: PicoGL.CLAMP_TO_EDGE});
-let depthTarget = app.createTexture2D(app.width, app.height, {format: PicoGL.DEPTH_COMPONENT, type: PicoGL.FLOAT});
+let depthTarget = app.createTexture2D(app.width, app.height, {internalFormat: PicoGL.DEPTH_COMPONENT16, type: PicoGL.FLOAT});
 let buffer = app.createFramebuffer().colorTarget(0, colorTarget).depthTarget(depthTarget);
 
 let projectionMatrix = mat4.create();
@@ -157,7 +156,6 @@ let modelRotation = quat.create();
 
 let drawCall = app.createDrawCall(program, vertexArray)
     .uniform("ambientColor", bgColor)
-    .uniform("diffuseColor", fgColor)
     .uniform("modelViewMatrix", modelViewMatrix)
     .uniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
 
@@ -184,17 +182,24 @@ function draw() {
     app.drawFramebuffer(buffer);
     app.viewport(0, 0, colorTarget.width, colorTarget.height);
 
-    app.depthTest().cullBackfaces().clear();
+    app.enable(PicoGL.DEPTH_TEST)
+       .enable(PicoGL.CULL_FACE)
+       .clear();
 
-    mat4.fromRotationTranslation(modelMatrix, modelRotation, vec3.fromValues(-1.2, 0, -2));
+    drawCall.uniform("diffuseColor", vec4.fromValues(0.3, 0.0, 1.0, 1.0));
+    mat4.fromRotationTranslation(modelMatrix, modelRotation, vec3.fromValues(-1.5, 0, -2));
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
     mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
     drawCall.draw();
+
+    drawCall.uniform("diffuseColor", vec4.fromValues(0.1, 1.0, 0.2, 1.0));
     mat4.fromRotationTranslation(modelMatrix, modelRotation, vec3.fromValues(0, 0, 0));
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
     mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
     drawCall.draw();
-    mat4.fromRotationTranslation(modelMatrix, modelRotation, vec3.fromValues(1.2, 0, 2));
+
+    drawCall.uniform("diffuseColor", vec4.fromValues(1.0, 0.0, 0.2, 1.0));
+    mat4.fromRotationTranslation(modelMatrix, modelRotation, vec3.fromValues(1.5, 0, 2));
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
     mat4.multiply(modelViewProjectionMatrix, viewProjMatrix, modelMatrix);
     drawCall.draw();
@@ -202,7 +207,8 @@ function draw() {
     app.defaultDrawFramebuffer();
     app.viewport(0, 0, app.width, app.height);
 
-    app.noDepthTest().drawBackfaces();
+    app.disable(PicoGL.DEPTH_TEST)
+       .disable(PicoGL.CULL_FACE);
     postDrawCall.uniform("time", time);
     postDrawCall.draw();
 
