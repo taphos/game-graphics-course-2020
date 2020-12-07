@@ -104,6 +104,9 @@ let postFragmentShader = `
         // Contrast + Brightness
         col = pow(col, vec4(1.5)) * 2.0;
         
+        // Color curves
+        col.rgb = col.rgb * vec3(1.2, 1.1, 1.0) + vec3(0.0, 0.05, 0.2);
+        
         // Ambient Occlusion
         //col = ambientOcclusion(col, depth, v_position.xy);                
         
