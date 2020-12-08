@@ -154,7 +154,7 @@ async function loadTexture(fileName) {
         .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, postIndices));
 
     let colorTarget = app.createTexture2D(app.width, app.height, {magFilter: PicoGL.LINEAR, wrapS: PicoGL.CLAMP_TO_EDGE, wrapR: PicoGL.CLAMP_TO_EDGE});
-    let depthTarget = app.createTexture2D(app.width, app.height, {internalFormat: PicoGL.DEPTH_COMPONENT16, type: PicoGL.FLOAT});
+    let depthTarget = app.createTexture2D(app.width, app.height, {internalFormat: PicoGL.DEPTH_COMPONENT32F, type: PicoGL.FLOAT});
     let buffer = app.createFramebuffer().colorTarget(0, colorTarget).depthTarget(depthTarget);
 
     let projectionMatrix = mat4.create();
