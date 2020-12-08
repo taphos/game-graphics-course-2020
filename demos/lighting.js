@@ -1,7 +1,7 @@
 import PicoGL from "../node_modules/picogl/build/module/picogl.js";
-import {mat4, vec3} from "../node_modules/gl-matrix/esm/index.js";
+import {mat4, vec3, quat} from "../node_modules/gl-matrix/esm/index.js";
 
-import {positions, normals, indices} from "../blender/monkey.js"
+import {positions, normals, indices} from "../blender/nautilus.js"
 
 // ******************************************************
 // **               Light configuration                **
@@ -100,7 +100,7 @@ let program = app.createProgram(vertexShader.trim(), fragmentShader.trim());
 let vertexArray = app.createVertexArray()
     .vertexAttributeBuffer(0, app.createVertexBuffer(PicoGL.FLOAT, 3, positions))
     .vertexAttributeBuffer(1, app.createVertexBuffer(PicoGL.FLOAT, 3, normals))
-    .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_SHORT, 3, indices));
+    .indexBuffer(app.createIndexBuffer(PicoGL.UNSIGNED_INT, 3, indices));
 
 let projectionMatrix = mat4.create();
 let viewMatrix = mat4.create();
@@ -113,13 +113,14 @@ let drawCall = app.createDrawCall(program, vertexArray)
 let startTime = new Date().getTime() / 1000;
 
 let cameraPosition = vec3.fromValues(0, 0, 5);
-mat4.fromXRotation(modelMatrix, -Math.PI / 2);
 
 const positionsBuffer = new Float32Array(numberOfLights * 3);
 const colorsBuffer = new Float32Array(numberOfLights * 3);
 
 function draw() {
     let time = new Date().getTime() / 1000 - startTime;
+
+    mat4.fromRotationTranslation(modelMatrix, quat.fromEuler(quat.create(), -90, time * 30, 0), vec3.fromValues(0, 0, 0));
 
     mat4.perspective(projectionMatrix, Math.PI / 4, app.width / app.height, 0.1, 100.0);
     mat4.lookAt(viewMatrix, cameraPosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));

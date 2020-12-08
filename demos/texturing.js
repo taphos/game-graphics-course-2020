@@ -33,15 +33,19 @@ let fragmentShader = `
     #version 300 es
     precision highp float;
     
-    uniform sampler2D tex;    
+    uniform sampler2D tex;
+    uniform float time;
     
     in vec2 v_uv;
     
     out vec4 outColor;
     
     void main()
-    {        
-        outColor = texture(tex, v_uv);
+    {
+        // Combining 2 texture samples with multiplied uv coordinates
+        // Using time for second uv animation
+        outColor = texture(tex, (v_uv - 0.5) * 2.0)
+            + pow(texture(tex, (v_uv - 0.5) * 2.0 * sin(time * 3.46641)), vec4(2.0)) * 10.0;
     }
 `;
 
@@ -59,7 +63,8 @@ let vertexShader = `
     
     void main()
     {
-        gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);           
+        // Cube size is multiplied by 2
+        gl_Position = modelViewProjectionMatrix * vec4(position * 2.0, 1.0);           
         v_uv = uv;
     }
 `;
@@ -71,6 +76,7 @@ let skyboxFragmentShader = `
     precision mediump float;
     
     uniform samplerCube cubemap;
+    uniform samplerCube cubemap2;
     uniform mat4 viewProjectionInverse;
     in vec4 v_position;
     
@@ -78,7 +84,8 @@ let skyboxFragmentShader = `
     
     void main() {
       vec4 t = viewProjectionInverse * v_position;
-      outColor = texture(cubemap, normalize(t.xyz / t.w));
+      // Combining 2 cubemaps
+      outColor = pow(texture(cubemap, normalize(t.xyz / t.w)), vec4(5.0)) * 2.0 + texture(cubemap2, normalize(t.xyz / t.w)) * 0.2;
     }
 `;
 
@@ -131,8 +138,8 @@ async function loadTexture(fileName) {
             magFilter: PicoGL.LINEAR,
             minFilter: PicoGL.LINEAR_MIPMAP_LINEAR,
             maxAnisotropy: 10,
-            wrapS: PicoGL.REPEAT,
-            wrapT: PicoGL.REPEAT
+            wrapS: PicoGL.MIRRORED_REPEAT,
+            wrapT: PicoGL.MIRRORED_REPEAT
         }));
 
     let skyboxDrawCall = app.createDrawCall(skyboxProgram, skyboxArray)
@@ -144,6 +151,14 @@ async function loadTexture(fileName) {
             negZ: await loadTexture("stormydays_lf.png"),
             posZ: await loadTexture("stormydays_rt.png")
         }));
+    skyboxDrawCall.texture("cubemap2", app.createCubemap({
+        negX: tex,
+        posX: tex,
+        negY: tex,
+        posY: tex,
+        negZ: tex,
+        posZ: tex
+    }));
 
     let startTime = new Date().getTime() / 1000;
 
@@ -152,12 +167,12 @@ async function loadTexture(fileName) {
         let time = new Date().getTime() / 1000 - startTime;
 
         mat4.perspective(projMatrix, Math.PI / 2, app.width / app.height, 0.1, 100.0);
-        let camPos = vec3.rotateY(vec3.create(), vec3.fromValues(0, 0.5, 2), vec3.fromValues(0, 0, 0), time * 0.05);
+        let camPos = vec3.rotateY(vec3.create(), vec3.fromValues(0, 0.5, 3), vec3.fromValues(0, 0, 0), time * 0.5);
         mat4.lookAt(viewMatrix, camPos, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
         mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
 
-        mat4.fromXRotation(rotateXMatrix, time * 0.1136);
-        mat4.fromZRotation(rotateYMatrix, time * 0.2235);
+        mat4.fromXRotation(rotateXMatrix, time * 1.1136);
+        mat4.fromZRotation(rotateYMatrix, time * 1.2235);
         mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
 
         mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
@@ -174,6 +189,8 @@ async function loadTexture(fileName) {
         skyboxDrawCall.draw();
 
         app.enable(PicoGL.DEPTH_TEST);
+        // passing time value for uv animation
+        drawCall.uniform("time", time);
         drawCall.uniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
         drawCall.draw();
 
