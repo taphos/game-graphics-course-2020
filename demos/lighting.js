@@ -51,7 +51,9 @@ let fragmentShader = `
     ${lightCalculationShader}
 
     uniform sampler2D tex;
-    
+    uniform samplerCube cubemap;
+
+    in vec3 viewDir;
     in vec3 vPosition;    
     in vec3 vNormal;
     in vec4 vColor;
@@ -59,9 +61,12 @@ let fragmentShader = `
     
     out vec4 outColor;        
     
-    void main() {                      
+    void main() {
+        vec3 reflectedDir = reflect(viewDir, normalize(vNormal));
+        vec4 reflection = pow(texture(cubemap, reflectedDir), vec4(5.0)) * 0.3;
+        
         // For Phong shading (per-fragment) move color calculation from vertex to fragment shader
-        outColor = calculateLights(normalize(vNormal), vPosition) * (texture(tex, v_uv));
+        outColor = calculateLights(normalize(vNormal), vPosition) * texture(tex, v_uv) + reflection;
         // outColor = vColor;
     }
 `;
@@ -76,8 +81,9 @@ let vertexShader = `
     layout(location=2) in vec2 uv;
     
     uniform mat4 viewProjectionMatrix;
-    uniform mat4 modelMatrix;            
-    
+    uniform mat4 modelMatrix;
+
+    out vec3 viewDir;
     out vec3 vPosition;    
     out vec3 vNormal;
     out vec4 vColor;
@@ -89,6 +95,7 @@ let vertexShader = `
         vPosition = worldPosition.xyz;        
         vNormal = (modelMatrix * normal).xyz;
         v_uv = vec2(uv.x, -uv.y);
+        viewDir = (modelMatrix * position).xyz - cameraPosition;
         
         // For Gouraud shading (per-vertex) move color calculation from fragment to vertex shader
         //vColor = calculateLights(normalize(vNormal), vPosition);
@@ -131,6 +138,16 @@ async function loadTexture(fileName) {
         minFilter: PicoGL.LINEAR_MIPMAP_LINEAR,
         maxAnisotropy: 10
     }));
+
+    const cubemap = app.createCubemap({
+        negX: await loadTexture("stormydays_bk.png"),
+        posX: await loadTexture("stormydays_ft.png"),
+        negY: await loadTexture("stormydays_dn.png"),
+        posY: await loadTexture("stormydays_up.png"),
+        negZ: await loadTexture("stormydays_lf.png"),
+        posZ: await loadTexture("stormydays_rt.png")
+    });
+    drawCall.texture("cubemap", cubemap);
 
     let startTime = new Date().getTime() / 1000;
 
