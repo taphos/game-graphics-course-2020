@@ -62,11 +62,12 @@ let fragmentShader = `
     out vec4 outColor;        
     
     void main() {
-        vec3 reflectedDir = reflect(viewDir, normalize(vNormal));
-        vec4 reflection = pow(texture(cubemap, reflectedDir), vec4(5.0)) * 0.3;
+        vec3 reflectedDir = reflect(viewDir, normalize(vNormal));        
         
         // For Phong shading (per-fragment) move color calculation from vertex to fragment shader
-        outColor = calculateLights(normalize(vNormal), vPosition) * texture(tex, v_uv) + reflection;
+        outColor = calculateLights(normalize(vNormal), vPosition) * texture(tex, v_uv);
+        // vec4 reflection = pow(texture(cubemap, reflectedDir), vec4(5.0)) * 0.3;
+        // outColor += reflection;
         // outColor = vColor;
     }
 `;
@@ -159,7 +160,7 @@ async function loadTexture(fileName) {
     function draw() {
         let time = new Date().getTime() / 1000 - startTime;
 
-        mat4.fromRotationTranslation(modelMatrix, quat.fromEuler(quat.create(), -90, time * 30, 0), vec3.fromValues(0, -0.2, 0));
+        mat4.fromRotationTranslation(modelMatrix, quat.fromEuler(quat.create(), -90, time * 20, 0), vec3.fromValues(0, -0.2, 0));
 
         mat4.perspective(projectionMatrix, Math.PI / 6, app.width / app.height, 0.1, 100.0);
         mat4.lookAt(viewMatrix, cameraPosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
@@ -170,7 +171,7 @@ async function loadTexture(fileName) {
         drawCall.uniform("cameraPosition", cameraPosition);
 
         for (let i = 0; i < numberOfLights; i++) {
-            vec3.rotateZ(lightPositions[i], lightInitialPositions[i], vec3.fromValues(0, 0, 0), time);
+            vec3.rotateZ(lightPositions[i], lightInitialPositions[i], vec3.fromValues(0, 0, 0), time * 4);
             positionsBuffer.set(lightPositions[i], i * 3);
             colorsBuffer.set(lightColors[i], i * 3);
         }
