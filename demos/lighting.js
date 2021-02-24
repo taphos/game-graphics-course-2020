@@ -112,7 +112,7 @@ async function loadTexture(fileName) {
 
     let lightColors = [vec3.fromValues(1.0, 0.5, 0.7), vec3.fromValues(0.5, 0.6, 1.0)];
 
-    app.clearColor(0.07, 0.01, 0.04, 1.0)
+    app.clearColor(0.97, 0.21, 0.54, 1.0)
        .enable(PicoGL.DEPTH_TEST)
        .enable(PicoGL.CULL_FACE);
 
@@ -159,9 +159,9 @@ async function loadTexture(fileName) {
     function draw() {
         let time = new Date().getTime() / 1000 - startTime;
 
-        mat4.fromRotationTranslation(modelMatrix, quat.fromEuler(quat.create(), -90, time * 30, 0), vec3.fromValues(0, 0, 0));
+        mat4.fromRotationTranslation(modelMatrix, quat.fromEuler(quat.create(), -90, time * 30, 0), vec3.fromValues(0, -0.2, 0));
 
-        mat4.perspective(projectionMatrix, Math.PI / 4, app.width / app.height, 0.1, 100.0);
+        mat4.perspective(projectionMatrix, Math.PI / 6, app.width / app.height, 0.1, 100.0);
         mat4.lookAt(viewMatrix, cameraPosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
         mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
